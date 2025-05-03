@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Language Recognition</title>
+    <link href="https://fonts.googleapis.com/css?family=Poppins:400,600&display=swap" rel="stylesheet">
+    <style>
+
+        body {
+            background: #1a1a1a;
+            color: #fff;
+            font-family: 'Poppins', Arial, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            color: #00ff99;
+        }
+
+        .instructions {
+            background: rgba(40, 40, 40, 0.9);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .hide-btn {
+            background: #ff5050;
+            color: white;
+            padding: 8px;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .hide-btn:hover {
+            background: #cc3e3e;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 480px;
+            margin: 20px;
+            box-shadow: 0 4px 32px rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        #videoFeed {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 8px;
+        }
+
+        #prediction {
+            font-size: 2.5rem;
+            color: #00ff99;
+            text-align: center;
+            margin-top: 20px;
+            letter-spacing: 1px;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .button {
+            background: #6200EE;
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            border-radius: 6px;
+            border: none;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .button:hover, .button:focus {
+            background: #3700B3;
+            transform: translateY(-3px);
+            outline: none;
+        }
+
+        #currentWord {
+            font-size: 1.8rem;
+            margin-top: 24px;
+            color: #ffcc00;
+            letter-spacing: 1.5px;
+            text-align: center;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        @media (max-width: 600px) {
+            .video-container { 
+                width: 95%;
+            }
+            .instructions {
+                font-size: 0.9rem;
+                padding: 15px 10px;
+            }
+            .button {
+                font-size: 1rem;
+                padding: 12px 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Sign Language Recognition</h1>
+
+    <div class="instructions" id="instructions">
+        <strong>How to use:</strong>
+        <ul>
+            <li>Make a sign with your hand in front of your webcam, inside the green square.</li>
+            <li>The predicted letter will appear below the camera preview.</li>
+            <li><strong>Enter</strong> button or <strong>Enter</strong> key: Add the predicted letter to the current word.</li>
+            <li><strong>Backspace</strong> button or <strong>Backspace</strong> key: Delete the last letter from the word.</li>
+            <li>Your current word is shown below the buttons. Refresh the page to start over.</li>
+        </ul>
+        <button class="hide-btn" onclick="toggleInstructions()">Hide Instructions</button>
+    </div>
+
+    <div class="video-container">
+        <img src="{{ url_for('video_feed') }}" id="videoFeed" />
+    </div>
+
+    <div id="prediction">
+        Predicted Letter: <span id="predictedLetter">-</span>
+    </div>
+
+    <div class="controls">
+        <button class="button" id="enterBtn">Enter (⏎)</button>
+        <button class="button" id="backspaceBtn">Backspace (⌫)</button>
+    </div>
+
+    <div id="currentWord"></div>
+
+    <script>
+
+        function updatePrediction() {
+            fetch('/current_prediction')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("predictedLetter").innerText = data.letter || "-";
+                });
+        }
+        setInterval(updatePrediction, 300);
+
+        function addLetterConfirm() {
+            fetch(`/add_letter_confirm`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("currentWord").innerText = data.word;
+                });
+        }
+
+        function clearWord() {
+            fetch(`/add_letter/del`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("currentWord").innerText = data.word;
+                });
+        }
+
+        document.getElementById("enterBtn").addEventListener("click", addLetterConfirm);
+        document.getElementById("backspaceBtn").addEventListener("click", clearWord);
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "Enter") {
+                addLetterConfirm();
+            } else if (event.key === "Backspace") {
+                clearWord();
+                event.preventDefault();
+            }
+        });
+
+        function toggleInstructions() {
+            const instructions = document.getElementById('instructions');
+            instructions.style.display = (instructions.style.display === 'none') ? 'block' : 'none';
+        }
+    </script>
+
+</body>
+</html>

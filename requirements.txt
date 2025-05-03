@@ -6,3 +6,5 @@ matplotlib
 opencv-python
 tensorflow
 scikit-learn
+Flask
+opencv-python-headless
