@@ -1,47 +1,28 @@
 # ASL Alphabet Image Classification
 
-This project builds a deep learning model to classify images of the American Sign Language (ASL) alphabet using TensorFlow and Keras. It covers data preprocessing, augmentation, model training, and evaluation.
-
----
-
-## Table of Contents
-
-- [Overview](#overview)
-- [Dataset](#dataset)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Model Architecture](#model-architecture)
-- [Results](#results)
-- [Improvements](#improvements)
-- [Contributing](#contributing)
-- [License](#license)
-
----
+This project builds a convolutional neural network with TensorFlow and Keras to classify images of American Sign Language (ASL) alphabet signs.
 
 ## Overview
 
-The goal is to recognize ASL alphabet signs from images. The workflow includes:
-- Organizing and preprocessing the dataset
-- Applying data augmentation
-- Training a Convolutional Neural Network (CNN)
-- Evaluating model performance
+The notebooks cover dataset preparation, image preprocessing, augmentation, model training, and evaluation.
 
----
+- [Explore sample images](notebooks/images.ipynb)
+- [Review dataset preparation](notebooks/datacleaning.ipynb)
+- [Review preprocessing and training](notebooks/load_preprocess.ipynb)
 
 ## Dataset
 
-- **Training Data:** Images of ASL signs in class folders
-- **Testing Data:** Images for evaluating model performance
+The training and test images are separate from this repository. The notebooks look for local datasets under `data/raw/` and `data/processed/`. Check the path variables in each notebook before running its cells.
 
-Preprocessing steps:
-- Normalizing pixel values
-- Rearranging test images into class folders
+## Setup
 
----
+```bash
+git clone https://github.com/ChahineDerbali/Sign-Language-Project.git
+cd Sign-Language-Project
+```
 
-## Installation
+See [requirements.txt](requirements.txt) for the project's Python dependencies. The webcam, Flask, and Streamlit demos reference a model file at a machine-specific path and need additional setup before they can run from a fresh clone.
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/ASL-Alphabet-Classification.git
-   cd ASL-Alphabet-Classification
+## License
+
+See [LICENCE](LICENCE).
